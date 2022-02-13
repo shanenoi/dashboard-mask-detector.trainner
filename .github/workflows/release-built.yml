@@ -6,7 +6,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -28,14 +27,20 @@ jobs:
     - name: Compress Model
       run: zip mask_detector.zip mask_detector.model
 
+    - name: Get Release Time
+      id: get-release-time
+      run: |
+        echo "::set-output name=time::`date +\"%D-%T\"`"
+        echo "::set-output name=unix::`date +%s`"
+
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        tag_name: ${{steps.get-release-time.outputs.unix}}
+        release_name: Release ${{steps.get-release-time.outputs.time}}
         draft: false
         prerelease: false
 
